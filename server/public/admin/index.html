@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商城后台管理系统</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="/admin/libs/index.css">
+    <!-- 添加 Tailwind CSS -->
+    <script src="/admin/libs/tailwind.min.js"></script>
+    <style>
+        .app-container {
+            @apply p-4 w-full max-w-[1200px] mx-auto;
+        }
+
+        .login-container {
+            @apply w-full max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md;
+        }
+
+        .search-form {
+            @apply bg-white p-4 rounded-lg shadow-sm mb-4;
+        }
+
+        .action-bar {
+            @apply my-4;
+        }
+
+        .el-dialog {
+            @apply w-[90%] max-w-lg !important;
+        }
+
+        .el-table {
+            @apply w-full overflow-x-auto;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .mobile-menu {
+                @apply fixed bottom-0 left-0 right-0 bg-white shadow-lg z-50;
+                height: 64px;
+            }
+
+            .mobile-menu .el-menu {
+                @apply flex justify-around items-center h-full border-t border-gray-200;
+                border-right: none !important;
+            }
+
+            .mobile-menu .el-menu-item {
+                @apply flex flex-col items-center justify-center py-1 px-2 flex-1;
+                height: auto !important;
+                border-bottom: none !important;
+                background-color: transparent !important;
+            }
+
+            .mobile-menu .el-menu-item.is-active {
+                background-color: transparent !important;
+            }
+
+            .mobile-menu .el-menu-item .el-icon {
+                @apply mb-1;
+                margin-right: 0 !important;
+            }
+
+            .mobile-menu .el-menu-item span {
+                @apply text-xs;
+                line-height: 1;
+            }
+
+            /* 覆盖 Element Plus 的默认选中样式 */
+            .mobile-menu .el-menu-item:hover,
+            .mobile-menu .el-menu-item:focus {
+                background-color: transparent !important;
+            }
+
+            .mobile-menu .el-menu--horizontal>.el-menu-item.is-active {
+                border-bottom: none !important;
+            }
+
+            .el-main {
+                @apply pb-20;
+            }
+
+            .el-aside {
+                @apply hidden;
+            }
+        }
+
+        /* 隐藏滚动条但保持可滚动 */
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+            /* Chrome, Safari and Opera */
+        }
+
+        .el-main {
+            overflow: hidden !important;
+        }
+    </style>
+</head>
+
+<style>
+    @keyframes marquee {
+        0% {
+            transform: translateX(0%);
+        }
+
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+</style>
+
+<body class="bg-gray-50">
+    <div id="app">
+        <template v-if="isLoggedIn">
+            <el-container class="min-h-screen">
+                <!-- 优化侧边栏 -->
+                <el-aside :class="[
+                    'bg-white shadow-sm transition-all border-r duration-300 flex flex-col overflow-x-hidden relative',
+                    isCollapse ? 'w-[64px]' : 'w-[180px]'
+                ]">
+                    <!-- 菜单区域 -->
+                    <el-menu router :collapse="isCollapse" :collapse-transition="false"
+                        class="!flex-1 !border-none !overflow-x-hidden !overflow-y-auto" :default-active="$route.path">
+                        <el-menu-item index="/dashboard" class="!flex !items-center">
+                            <el-icon class="!mr-2">
+                                <house />
+                            </el-icon>
+                            <template #title>
+                                <span class="whitespace-nowrap">首页</span>
+                            </template>
+                        </el-menu-item>
+                        <el-menu-item index="/categories" class="!flex !items-center">
+                            <el-icon class="!mr-2">
+                                <folder />
+                            </el-icon>
+                            <template #title>
+                                <span class="whitespace-nowrap">分类管理</span>
+                            </template>
+                        </el-menu-item>
+                        <el-menu-item index="/products" class="!flex !items-center">
+                            <el-icon class="!mr-2">
+                                <goods />
+                            </el-icon>
+                            <template #title>
+                                <span class="whitespace-nowrap">商品管理</span>
+                            </template>
+                        </el-menu-item>
+                        <el-menu-item index="/orders" class="!flex !items-center">
+                            <el-icon class="!mr-2"><shopping-cart /></el-icon>
+                            <template #title>
+                                <span class="whitespace-nowrap">订单管理</span>
+                            </template>
+                        </el-menu-item>
+                        <el-menu-item index="/users" class="!flex !items-center">
+                            <el-icon class="!mr-2">
+                                <user />
+                            </el-icon>
+                            <template #title>
+                                <span class="whitespace-nowrap">用户管理</span>
+                            </template>
+                        </el-menu-item>
+                        <el-menu-item index="/configs" class="!flex !items-center">
+                            <el-icon class="!mr-2">
+                                <setting />
+                            </el-icon>
+                            <template #title>
+                                <span class="whitespace-nowrap">系统设置</span>
+                            </template>
+                        </el-menu-item>
+                    </el-menu>
+
+                    <!-- 底部折叠按钮 -->
+                    <div @click="toggleCollapse"
+                        class="flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 border-t border-gray-100 transition-colors duration-300 sticky bottom-0 bg-white w-full">
+                        <div v-if="!isCollapse" class="flex items-center justify-center h-12 w-full">
+                            <div class="flex absolute" style="animation: marquee 12s linear infinite;">
+                                <span class="text-sm text-gray-500 whitespace-nowrap pr-4">
+                                    本项目仅供学习和测试使用、禁止用于任何非法用途，后果自己负责。
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-center h-12 w-full">
+                            <template v-if="isCollapse">
+                                <el-icon class="text-gray-400"><arrow-right /></el-icon>
+                            </template>
+                            <template v-else>
+                                <el-icon class="text-gray-400"><arrow-left /></el-icon>
+                                <span class="ml-2 text-sm text-gray-500 whitespace-nowrap line-clamp-1">收起菜单</span>
+                            </template>
+                        </div>
+                    </div>
+                </el-aside>
+
+                <el-main class="!p-0 !h-screen overflow-hidden">
+                    <div class="h-full overflow-y-auto scrollbar-hide">
+                        <router-view></router-view>
+                    </div>
+                </el-main>
+            </el-container>
+        </template>
+        <template v-else>
+            <!-- 登录界面 -->
+            <div
+                class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+                <div
+                    class="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 transition-all duration-300">
+                    <!-- 标题 -->
+                    <h2 class="text-2xl font-bold text-center text-gray-800 dark:text-white mb-8">
+                        后台管理系统
+                    </h2>
+
+                    <!-- 登录表单 -->
+                    <el-form ref="loginForm" :model="loginForm" class="space-y-6">
+                        <!-- 用户名输入框 -->
+                        <el-form-item>
+                            <el-input v-model="loginForm.username" class="h-12 text-base" placeholder="请输入用户名">
+                                <template #prefix>
+                                    <el-icon class="text-gray-400">
+                                        <user />
+                                    </el-icon>
+                                </template>
+                            </el-input>
+                        </el-form-item>
+
+                        <!-- 密码输入框 -->
+                        <el-form-item>
+                            <el-input v-model="loginForm.password" class="h-12 text-base" type="password"
+                                placeholder="请输入密码" @keyup.enter="handleLogin">
+                                <template #prefix>
+                                    <el-icon class="text-gray-400">
+                                        <lock />
+                                    </el-icon>
+                                </template>
+                            </el-input>
+                        </el-form-item>
+
+                        <!-- 登录按钮 -->
+                        <el-button type="primary"
+                            class="w-full h-12 text-base font-medium !bg-blue-500 hover:!bg-blue-600 border-0 transition-colors duration-300"
+                            :loading="loading" @click="handleLogin">
+                            {{ loading ? '登录中...' : '登录' }}
+                        </el-button>
+                    </el-form>
+
+                    <!-- 安全提示 -->
+                    <div class="mt-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <div class="flex items-center text-gray-600 dark:text-gray-300 mb-2">
+                            <el-icon class="mr-2">
+                                <warning />
+                            </el-icon>
+                            <span class="text-sm font-medium">安全提示</span>
+                        </div>
+                        <ul class="text-sm text-gray-500 dark:text-gray-400 space-y-1 ml-6 list-disc">
+                            <li>请使用复杂密码并定期更换</li>
+                            <li>请勿在公共场所保存登录信息</li>
+                            <li>登录异常请及时联系管理员</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+
+    <!-- 引入依赖 -->
+    <script src="/admin/libs/vue.global.js"></script>
+    <script src="/admin/libs/vue-router.global.js"></script>
+    <script src="/admin/libs/index.full.js"></script>
+    <script src="/admin/libs/axios.min.js"></script>
+    <script src="/admin/libs/index.iife.min.js"></script>
+    <script src="/admin/libs/qrcode.min.js"></script>
+    <script src="/admin/libs/qr-code-styling.js"></script>
+    <script src="/admin/libs/echarts.min.js"></script>
+
+    <!-- 引入业务代码 -->
+    <script src="/admin/js/api.js"></script>
+    <script src="/admin/js/dashboard.js"></script>
+    <script src="/admin/js/products.js"></script>
+    <script src="/admin/js/categories.js"></script>
+    <script src="/admin/js/orders.js"></script>
+    <script src="/admin/js/users.js"></script>
+    <script src="/admin/js/configs.js"></script>
+    <script src="/admin/js/app.js"></script>
+</body>
+
+</html>
