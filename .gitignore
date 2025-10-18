@@ -1,0 +1,76 @@
+# 忽略不需要上传的文件
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 环境变量文件
+.env
+.env.local
+.env.production
+.env.prod
+
+# 日志文件
+logs/
+*.log
+
+# 运行时文件
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# 依赖目录
+.npm
+.yarn-integrity
+
+# 可选npm缓存目录
+.npm
+
+# 可选eslint缓存
+.eslintcache
+
+# 微服务环境变量
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 临时文件
+.tmp/
+temp/
+
+# IDE文件
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# Docker相关
+docker-compose.override.yml
+
+# SSL证书（敏感文件）
+ssl/
+*.pem
+*.key
+*.crt
+
+# 备份文件
+*.bak
+*.backup
+
+# 压缩文件
+*.zip
+*.tar.gz
+*.rar
+
+# 数据库文件
+*.db
+*.sqlite
+
+# 上传文件目录
+uploads/
+public/uploads/

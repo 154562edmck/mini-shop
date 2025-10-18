@@ -1,6 +1,6 @@
 window.APP_CONFIG = {
-    API_URL: 'https://ht2.s7s7s7.cn/v1',
-    ASSET_PREFIX: 'https://waimai2.s7s7s7.cn',
+    API_URL: 'http://localhost:4000/v1',
+    ASSET_PREFIX: 'http://localhost:4001',
     WECHAT_APP_ID: 'wx24cf9fafe860e29d'
 }; (function () {
     const config = window.APP_CONFIG;

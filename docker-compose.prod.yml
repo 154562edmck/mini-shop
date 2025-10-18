@@ -1,0 +1,117 @@
+version: '3.8'
+
+services:
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: shop-mysql-prod
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      HTTP_PROXY: ${HTTP_PROXY}
+      HTTPS_PROXY: ${HTTPS_PROXY}
+      NO_PROXY: localhost,127.0.0.1
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data_prod:/var/lib/mysql
+      - ./server/mini_shop.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    networks:
+      - shop-network-prod
+
+  # 后端服务
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.prod
+    container_name: shop-backend-prod
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=${MYSQL_USER}
+      - DB_PASSWORD=${MYSQL_PASSWORD}
+      - DB_DATABASE=${MYSQL_DATABASE}
+      - PORT=4000
+      - BASE_URL=${BASE_URL}
+      - CLIENT_URL=${CLIENT_URL}
+      - WECHAT_APP_ID=${WECHAT_APP_ID}
+      - WECHAT_APP_SECRET=${WECHAT_APP_SECRET}
+      - MCH_ID=${MCH_ID}
+      - SERIAL_NO=${SERIAL_NO}
+      - CERT_CONTENT=${CERT_CONTENT}
+      - PRIVATE_KEY_CONTENT=${PRIVATE_KEY_CONTENT}
+      - API_V3_KEY=${API_V3_KEY}
+      - ALIPAY_APP_ID=${ALIPAY_APP_ID}
+      - ALIPAY_PRIVATE_KEY=${ALIPAY_PRIVATE_KEY}
+      - ALIPAY_PUBLIC_KEY=${ALIPAY_PUBLIC_KEY}
+      - EASYPAY_DOMAIN=${EASYPAY_DOMAIN}
+      - EASYPAY_PID=${EASYPAY_PID}
+      - EASYPAY_KEY=${EASYPAY_KEY}
+      - EASYPAY_PUBLIC_KEY=${EASYPAY_PUBLIC_KEY}
+      - EASYPAY_PRIVATE_KEY=${EASYPAY_PRIVATE_KEY}
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+      - ./logs:/app/logs
+    depends_on:
+      - mysql
+    restart: unless-stopped
+    networks:
+      - shop-network-prod
+
+  # 前端服务
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.prod
+    container_name: shop-frontend-prod
+    ports:
+      - "4001:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=${CLIENT_URL}/v1
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+      - /app/.next
+      - ./logs:/app/logs
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - shop-network-prod
+
+  # Nginx 反向代理
+  nginx:
+    image: nginx:alpine
+    container_name: shop-nginx-prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./ssl:/etc/nginx/ssl
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+    networks:
+      - shop-network-prod
+
+volumes:
+  mysql_data_prod:
+
+networks:
+  shop-network-prod:
+    driver: bridge
+

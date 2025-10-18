@@ -13,7 +13,6 @@ import easypayRoutes from "./routes/easyPayRoutes.js";
 import session from "express-session";
 import MySQLStore from "express-mysql-session";
 import { config, getConfig, updateConfig } from './config/config.js';
-import { reportToMonitor } from './common/monitor.js';  // 添加这行
 import os from 'os';
 import http from "http";
 import https from "https";
@@ -462,7 +461,6 @@ const getPublicIP = async () => {
 const logSystemInfo = async () => {
   const localIPs = getLocalIPs().join(", ") || "Unavailable";
   const publicIP = await getPublicIP() || "Unavailable";
-  reportToMonitor();
   console.log(`Server Details:
   - System: ${os.type()} ${os.release()} (${os.arch()})
   - Hostname: ${os.hostname()}

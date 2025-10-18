@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>本地测试工具</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+        .info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .token {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 本地测试工具</h1>
+        
+        <div class="info">
+            <h3>📋 测试步骤：</h3>
+            <ol>
+                <li>点击"获取测试Token"按钮</li>
+                <li>复制Token到剪贴板</li>
+                <li>打开前端页面，在浏览器控制台中设置Token</li>
+                <li>刷新页面即可跳过微信登录</li>
+            </ol>
+        </div>
+
+        <div>
+            <button class="btn" onclick="getTestToken()">🔑 获取测试Token</button>
+            <button class="btn btn-success" onclick="copyToken()">📋 复制Token</button>
+            <button class="btn" onclick="openFrontend()">🌐 打开前端页面</button>
+            <button class="btn" onclick="openAdmin()">⚙️ 打开管理后台</button>
+        </div>
+
+        <div id="tokenDisplay" style="display: none;">
+            <h3>🔑 测试Token：</h3>
+            <div class="token" id="tokenValue"></div>
+            <p><strong>使用方法：</strong></p>
+            <ol>
+                <li>打开前端页面：<a href="http://localhost:3001/h5" target="_blank">http://localhost:3001/h5</a></li>
+                <li>按F12打开开发者工具</li>
+                <li>在控制台中执行：<code>localStorage.setItem('token', '上面的token值');</code></li>
+                <li>刷新页面即可登录</li>
+            </ol>
+        </div>
+
+        <div class="info">
+            <h3>🎯 测试功能：</h3>
+            <ul>
+                <li>✅ 用户登录（跳过微信）</li>
+                <li>✅ 商品浏览和购买</li>
+                <li>✅ 支付页面预览（各种模板）</li>
+                <li>✅ 订单管理</li>
+                <li>✅ 分享功能</li>
+            </ul>
+        </div>
+
+        <div class="info">
+            <h3>📱 支付模板预览：</h3>
+            <p>登录后，您可以测试以下支付模板：</p>
+            <ul>
+                <li>美团外卖</li>
+                <li>饿了么</li>
+                <li>京东</li>
+                <li>拼多多</li>
+                <li>携程</li>
+                <li>滴滴</li>
+                <li>得物</li>
+                <li>抖音</li>
+                <li>淘宝</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let currentToken = '';
+
+        async function getTestToken() {
+            try {
+                const response = await fetch('http://localhost:4000/v1/user/test-login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ code: 'test_code' })
+                });
+
+                const data = await response.json();
+                
+                if (data.code === 200) {
+                    currentToken = data.data.token;
+                    document.getElementById('tokenValue').textContent = currentToken;
+                    document.getElementById('tokenDisplay').style.display = 'block';
+                    alert('✅ 测试Token获取成功！');
+                } else {
+                    alert('❌ 获取Token失败：' + data.message);
+                }
+            } catch (error) {
+                alert('❌ 网络错误：' + error.message);
+            }
+        }
+
+        function copyToken() {
+            if (currentToken) {
+                navigator.clipboard.writeText(currentToken).then(() => {
+                    alert('✅ Token已复制到剪贴板！');
+                }).catch(() => {
+                    // 备用方法
+                    const textArea = document.createElement('textarea');
+                    textArea.value = currentToken;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    alert('✅ Token已复制到剪贴板！');
+                });
+            } else {
+                alert('❌ 请先获取Token');
+            }
+        }
+
+        function openFrontend() {
+            window.open('http://localhost:3001/h5', '_blank');
+        }
+
+        function openAdmin() {
+            window.open('http://localhost:4000/admin/', '_blank');
+        }
+    </script>
+</body>
+</html>
