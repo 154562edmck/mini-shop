@@ -1,5 +1,9 @@
 version: '3.8'
 
+# 加载环境变量文件
+env_file:
+  - .env.prod
+
 services:
   # MySQL 数据库
   mysql:
