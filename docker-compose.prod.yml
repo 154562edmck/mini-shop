@@ -1,14 +1,12 @@
 version: '3.8'
 
-# 加载环境变量文件
-env_file:
-  - .env.prod
-
 services:
   # MySQL 数据库
   mysql:
     image: mysql:8.0
     container_name: shop-mysql-prod
+    env_file:
+      - .env.prod
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -34,6 +32,8 @@ services:
       context: ./server
       dockerfile: Dockerfile.prod
     container_name: shop-backend-prod
+    env_file:
+      - .env.prod
     ports:
       - "4000:4000"
     environment:
@@ -77,6 +77,8 @@ services:
       context: ./client
       dockerfile: Dockerfile.prod
     container_name: shop-frontend-prod
+    env_file:
+      - .env.prod
     ports:
       - "4001:3000"
     environment:
@@ -97,6 +99,8 @@ services:
   nginx:
     image: nginx:alpine
     container_name: shop-nginx-prod
+    env_file:
+      - .env.prod
     ports:
       - "80:80"
       - "443:443"
