@@ -1,6 +1,6 @@
 window.APP_CONFIG = {
-    API_URL: 'http://localhost:4000/v1',
-    ASSET_PREFIX: 'http://localhost:4001',
+    API_URL: window.location.origin + '/v1',  // 使用当前域名，通过Nginx代理
+    ASSET_PREFIX: window.location.origin,
     WECHAT_APP_ID: 'wx24cf9fafe860e29d'
 }; (function () {
     const config = window.APP_CONFIG;
