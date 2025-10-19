@@ -1,10 +1,10 @@
 {
   "db": {
-    "host": "localhost",
+    "host": "mysql",
     "port": 3306,
-    "user": "kehu2",
-    "password": "kehu2",
-    "database": "kehu2"
+    "user": "shop_user",
+    "password": "MyStrongPassword123!",
+    "database": "mini_shop_prod"
   },
   "admin": {
     "username": "admin",
