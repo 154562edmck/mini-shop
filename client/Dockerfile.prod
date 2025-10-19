@@ -15,12 +15,15 @@ COPY . .
 # 构建应用
 RUN npm run build
 
-# 创建非root用户
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
+# 创建非root用户（在构建完成后创建，避免权限问题）
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001
 
-# 更改文件所有权
-RUN chown -R nextjs:nodejs /app
+# 只更改必要文件的所有权，避免递归操作大量文件
+RUN chown nextjs:nodejs /app && \
+    chown -R nextjs:nodejs /app/.next && \
+    chown -R nextjs:nodejs /app/public
+
 USER nextjs
 
 # 暴露端口

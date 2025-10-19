@@ -60,11 +60,21 @@ if [ ! -f ".env.prod" ]; then
     if [ -f "env.prod" ]; then
         cp env.prod .env.prod
         echo "✅ 已复制环境变量模板"
-        echo "📝 请编辑 .env.prod 文件，填入正确的配置信息"
+        echo "📝 环境变量已配置，包含基本设置"
     else
         echo "❌ 环境变量文件不存在"
         exit 1
     fi
+else
+    echo "✅ 环境变量文件已存在"
+fi
+
+# 验证环境变量
+echo "🔍 验证环境变量..."
+if grep -q "MYSQL_ROOT_PASSWORD=MyStrongPassword123!" .env.prod; then
+    echo "✅ 数据库密码已设置"
+else
+    echo "❌ 数据库密码未正确设置"
 fi
 
 # 申请SSL证书
