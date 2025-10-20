@@ -1,0 +1,4 @@
+"id","name","merchant_name","category_id","category_name","image","original_price","price","stock","is_on_sale","specs"
+"","测试商品1","测试商家","","测试分类","https://via.placeholder.com/300","100.00","88.00",100,1,"[{""name"":""默认"",""price"":""88.00"",""stock"":100}]"
+"","测试商品2","测试商家","","美食外卖","https://via.placeholder.com/300","50.00","38.00",200,1,"[{""name"":""小份"",""price"":""38.00"",""stock"":200},{""name"":""大份"",""price"":""58.00"",""stock"":100}]"
+"","测试商品3","测试商家","","水果外卖","https://via.placeholder.com/300","68.00","48.00",150,1,"[{""name"":""500g"",""price"":""48.00"",""stock"":150}]"
