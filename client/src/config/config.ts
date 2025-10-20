@@ -7,8 +7,9 @@
 /**
  * 是否使用basePath
  * 注意需要和 next.config.ts 中的 basePath 保持一致
+ * 生产环境不使用basePath，设置为空字符串
  */
-export const basePath = '/h5';
+export const basePath = '';
 
 
 /**
