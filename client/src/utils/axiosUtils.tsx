@@ -6,8 +6,8 @@ const getBaseUrl = () => {
     if (typeof window !== 'undefined' && window.APP_CONFIG) {
         return window.APP_CONFIG.API_URL;
     }
-    // 服务端渲染时使用默认值
-    return process.env.NEXT_PUBLIC_API_URL;
+    // 服务端渲染时使用环境变量，如果没有则使用相对路径
+    return process.env.NEXT_PUBLIC_API_URL || '/v1';
 };
 
 console.log('getBaseUrl', getBaseUrl());
