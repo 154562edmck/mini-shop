@@ -30,7 +30,7 @@ export const directWechatLogin = (templateId: number) => {
 };
 
 export default function LoginModal({ isOpen, onCloseAction, onSuccessAction }: LoginModalProps) {
-    const isDevelopment = false;
+    const isDevelopment = true;
 
     const handleTestLogin = async () => {
         try {
